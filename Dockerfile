@@ -3,5 +3,9 @@ WORKDIR /usr/src/app
 COPY package.json package*.json ./
 RUN npm install
 COPY . .
+
+# Reactアプリのビルド（本番用静的ファイル生成）
+RUN npm run build:client
+
 EXPOSE 3000
 CMD [ "npm", "start" ]
