@@ -1,6 +1,7 @@
 import express from "express";
 import path from "node:path";
 import fs from "fs";
+import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
 import "dotenv/config";
 
