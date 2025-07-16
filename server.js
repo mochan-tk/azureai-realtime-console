@@ -10,12 +10,22 @@ const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
 const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
 const apiVersion = process.env.OPENAI_API_VERSION;
 
+const isProd = process.env.NODE_ENV === "production";   // ←★追加
+
 // Configure Vite middleware for React client
-const vite = await createViteServer({
-  server: { middlewareMode: true },
-  appType: "custom",
-});
-app.use(vite.middlewares);
+let vite;
+if (!isProd) {
+  vite = await createViteServer({
+    server: { middlewareMode: true },
+    appType: "custom",
+  });
+  app.use(vite.middlewares);
+} else {
+  // 本番はビルド済み静的ファイルを配信
+  app.use(
+    express.static(path.resolve(__dirname, "dist/client"), { index: false }),
+  );
+}
 
 // API route for token generation
 app.get("/token", async (req, res) => {
