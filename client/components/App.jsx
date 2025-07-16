@@ -41,13 +41,14 @@ export default function App() {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    const baseUrl = "https://api.openai.com/v1/realtime";
-    const model = "gpt-4o-realtime-preview-2024-12-17";
+    // see: https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc
+    const baseUrl = "https://eastus2.realtimeapi-preview.ai.azure.com/v1/realtimertc";
+    const model = "gpt-4o-realtime-preview";
     const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
       method: "POST",
       body: offer.sdp,
       headers: {
-        Authorization: `Bearer ${EPHEMERAL_KEY}`,
+        "Authorization": `Bearer ${EPHEMERAL_KEY}`,
         "Content-Type": "application/sdp",
       },
     });

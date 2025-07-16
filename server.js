@@ -5,7 +5,10 @@ import "dotenv/config";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const apiKey = process.env.OPENAI_API_KEY;
+const apiKey = process.env.AZURE_OPENAI_API_KEY;
+const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
+const apiVersion = process.env.OPENAI_API_VERSION;
 
 // Configure Vite middleware for React client
 const vite = await createViteServer({
@@ -17,16 +20,19 @@ app.use(vite.middlewares);
 // API route for token generation
 app.get("/token", async (req, res) => {
   try {
+
+    // Generate ephemeral token for the client
+    // see: https://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/realtime-audio-webrtc
     const response = await fetch(
-      "https://api.openai.com/v1/realtime/sessions",
+      `${endpoint}openai/realtimeapi/sessions?api-version=${apiVersion}`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          "api-key": apiKey,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-realtime-preview-2025-06-03",
+          model: deploymentName,
           voice: "verse",
         }),
       },
