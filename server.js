@@ -59,18 +59,30 @@ app.get("/token", async (req, res) => {
 // Render the React client
 app.use("*", async (req, res, next) => {
   const url = req.originalUrl;
-
   try {
-    const template = await vite.transformIndexHtml(
-      url,
-      fs.readFileSync("./client/index.html", "utf-8"),
-    );
-    const { render } = await vite.ssrLoadModule("./client/entry-server.jsx");
+    let template, render;
+
+    if (!isProd) {
+      // 開発時: index.html を変換して動的インポート
+      template = await vite.transformIndexHtml(
+        url,
+        fs.readFileSync("./client/index.html", "utf-8"),
+      );
+      ({ render } = await vite.ssrLoadModule("./client/entry-server.jsx"));
+    } else {
+      // 本番時: ビルド成果物を使用
+      template = fs.readFileSync(
+        path.resolve(__dirname, "dist/client/index.html"),
+        "utf-8",
+      );
+      ({ render } = await import("./dist/server/index.js"));
+    }
+
     const appHtml = await render(url);
-    const html = template.replace(`<!--ssr-outlet-->`, appHtml?.html);
+    const html = template.replace("<!--ssr-outlet-->", appHtml.html);
     res.status(200).set({ "Content-Type": "text/html" }).end(html);
   } catch (e) {
-    vite.ssrFixStacktrace(e);
+    if (!isProd && vite) vite.ssrFixStacktrace(e);
     next(e);
   }
 });
