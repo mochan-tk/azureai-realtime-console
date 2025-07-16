@@ -6,6 +6,7 @@ COPY . .
 
 # Reactアプリのビルド（本番用静的ファイル生成）
 RUN npm run build:client
+RUN npm run build:server
 
 EXPOSE 3000
 CMD [ "npm", "start" ]
