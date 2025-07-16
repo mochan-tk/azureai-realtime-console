@@ -7,4 +7,9 @@ const path = fileURLToPath(import.meta.url);
 export default {
   root: join(dirname(path), "client"),
   plugins: [react()],
+  server: {
+    allowedHosts: [
+      "capp-lrdg274j2ubgw.orangecoast-dbf424fc.eastus2.azurecontainerapps.io"
+    ]
+  }
 };
